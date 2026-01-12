@@ -21,10 +21,10 @@ No external dependencies required (Standard Library only)
 2. Place the extracted `MyActivity.json` in the same directory as this script.
 3. Run the script:
    ```bash
-   python convert_history.py [input_file] [output_file] [--limit SIZE]
+   python convert_history.py [--input_file] [--output_file] [--limit SIZE]
    ```
-   - `input_file` (default: MyActivity.json): The Google Takeout JSON file to import
-   - `output_file` (default: Gemini_History.md): The output Markdown file name (sequentially numbered if split)
+   - `--input_file` (default: MyActivity.json): The Google Takeout JSON file to import
+   - `--output_file` (default: Gemini_History.md): The output Markdown file name (sequentially numbered)
    - `--limit` (default: 1500000): Maximum file size for splitting (in bytes)
 
    Example:

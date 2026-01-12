@@ -341,7 +341,8 @@ TRANSLATIONS = {
 def get_system_language() -> str:
     """detect OS language setting"""
     try:
-        lang, _ = locale.getdefaultlocale()
+        lang_tuple = locale.getlocale()
+        lang = lang_tuple[0] if lang_tuple and lang_tuple[0] else None
         if not lang:
             return "en"
 
@@ -489,9 +490,9 @@ def extract_text_content(entry: dict[str, Any], last_entry_time_loaded: datetime
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Convert Google Takeout JSON to Markdown for NotebookLM")
-    parser.add_argument("input_file", type=str, default="MyActivity.json", help="Path to input JSON file")
+    parser.add_argument("--input_file", type=str, default="MyActivity.json", help="Path to input JSON file")
     parser.add_argument(
-        "output_file", type=str, default="Gemini_History.md", help="Path to output Markdown file"
+        "--output_file", type=str, default="Gemini_History.md", help="Path to output Markdown file"
     )
     parser.add_argument("--limit", type=int, default=1500000, help="Split file size limit in bytes")
 
@@ -588,8 +589,9 @@ def main() -> None:
                 else t("written_to_file", output_filename)
             )
 
-        with open(LAST_ENTRY_TIME_FILE, "w", encoding="utf-8") as f:
-            f.write(last_entry_time_processed.isoformat())
+        if last_entry_time_loaded < last_entry_time_processed:
+            with open(LAST_ENTRY_TIME_FILE, "w", encoding="utf-8") as f:
+                f.write(last_entry_time_processed.isoformat())
 
         print(t("processing_complete", last_entry_time_loaded, last_entry_time_processed, file_index))
     except Exception as e:
