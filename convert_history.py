@@ -342,67 +342,22 @@ def get_system_language() -> str:
     """detect OS language setting"""
     try:
         lang, _ = locale.getdefaultlocale()
-        if lang:
-            if lang.startswith("ar"):
-                return "ar"
-            elif lang.startswith("bn"):
-                return "bn"
-            elif lang.startswith("de"):
-                return "de"
-            elif lang.startswith("es"):
-                return "es"
-            elif lang.startswith("fa"):
-                return "fa"
-            elif lang.startswith("fr"):
-                return "fr"
-            elif lang.startswith("hi"):
-                return "hi"
-            elif lang.startswith("id"):
-                return "id"
-            elif lang.startswith("it"):
-                return "it"
-            elif lang.startswith("ja"):
-                return "ja"
-            elif lang.startswith("jv"):
-                return "jv"
-            elif lang.startswith("ko"):
-                return "ko"
-            elif lang.startswith("mr"):
-                return "mr"
-            elif lang.startswith("ms"):
-                return "ms"
-            elif lang.startswith("pa"):
-                return "pa"
-            elif lang.startswith("pt"):
-                return "pt"
-            elif lang.startswith("ru"):
-                return "ru"
-            elif lang.startswith("sw"):
-                return "sw"
-            elif lang.startswith("ta"):
-                return "ta"
-            elif lang.startswith("te"):
-                return "te"
-            elif lang.startswith("th"):
-                return "th"
-            elif lang.startswith("tr"):
-                return "tr"
-            elif lang.startswith("uk"):
-                return "uk"
-            elif lang.startswith("ur"):
-                return "ur"
-            elif lang.startswith("vi"):
-                return "vi"
-            elif lang and (lang.startswith("zh_CN") or lang.startswith("zh-Hans")):
-                return "zh_CN"
-            elif lang.startswith("zh_TW") or lang.startswith("zh-Hant"):
-                return "zh_TW"
-            else:
-                return "en"
-        else:
+        if not lang:
             return "en"
+
+        if lang.startswith("zh_CN") or lang.startswith("zh-Hans") or lang == "Chinese_China":
+            return "zh_CN"
+        elif lang.startswith("zh_TW") or lang.startswith("zh-Hant") or lang == "Chinese_Taiwan":
+            return "zh_TW"
+
+        lang_code = lang.split("_")[0].split("-")[0].lower()
+        if lang_code in TRANSLATIONS:
+            return lang_code
+        return "en"
+
     except Exception as e:
-        print(t("error_lang_detection", e))
+        error_msg = TRANSLATIONS.get("en", {}).get("error_lang_detection", "Error: {}")
+        print(error_msg.format(e))
         return "en"
 
 

@@ -12,6 +12,9 @@ This script converts Gemini history data exported via Google Takeout (default: `
 ## Dependencies
 No external dependencies required (Standard Library only)
 
+## Requirements
+- Python 3.9 or higher
+
 ## Usage
 
 1. Download your "My Activity" data from Google Takeout in JSON format.
