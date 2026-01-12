@@ -1,6 +1,6 @@
-[日本語版READMEはこちら](README.ja.md)
-
 # Gemini Json2md for NotebookLM
+
+[日本語版READMEはこちら](README.ja.md)
 
 This script converts Gemini history data exported via Google Takeout (default: `MyActivity.json`) into sequential Markdown files (default: `Gemini_History-00.md`) that are easy to import into NotebookLM.
 

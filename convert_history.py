@@ -11,6 +11,18 @@ from typing import Any
 LAST_ENTRY_TIME_FILE = "last_entry_time.txt"
 
 TRANSLATIONS = {
+    "ar": {
+        "error_lang_detection": "خطأ أثناء اكتشاف لغة النظام: {}",
+        "file_not_found": "خطأ: الملف غير موجود: {}",
+        "json_decode_error": "خطأ في فك ترميز JSON: {}",
+        "start_processing": "🚀 بدء المعالجة: جاري تحميل {}...",
+        "extracted_entries": "تم استخراج {0} مدخلات، منها {1} هي سجل Gemini.",
+        "converting_markdown": "جارٍ التحويل إلى Markdown...",
+        "appended_to_file": "تمت إضافة سجلات الدردشة إلى الملف: {}",
+        "written_to_file": "تم كتابة سجلات الدردشة إلى الملف: {}",
+        "processing_complete": "✅ اكتمل: تم حفظ السجل من {0} إلى {1} في إجمالي {2} ملفات.",
+        "error_occurred": "حدث خطأ: {}",
+    },
     "bn": {
         "error_lang_detection": "সিস্টেম ভাষা সনাক্তকরণে ত্রুটি: {}",
         "file_not_found": "ত্রুটি: ফাইল পাওয়া যায়নি: {}",
@@ -58,6 +70,18 @@ TRANSLATIONS = {
         "written_to_file": "Historiales de chat escritos en el archivo: {}",
         "processing_complete": "✅ Completado: Historial guardado desde {0} hasta {1} en un total de {2} archivos.",
         "error_occurred": "Ocurrió un error: {}",
+    },
+    "fa": {
+        "error_lang_detection": "خطا در شناسایی زبان سیستم: {}",
+        "file_not_found": "خطا: فایل پیدا نشد: {}",
+        "json_decode_error": "خطای رمزگشایی JSON: {}",
+        "start_processing": "🚀 شروع پردازش: در حال بارگذاری {}...",
+        "extracted_entries": "{0} ورودی استخراج شد که {1} مورد از آن‌ها تاریخچه Gemini است.",
+        "converting_markdown": "در حال تبدیل به Markdown...",
+        "appended_to_file": "تاریخچه چت به فایل اضافه شد: {}",
+        "written_to_file": "تاریخچه چت در فایل نوشته شد: {}",
+        "processing_complete": "✅ تکمیل شد: تاریخچه از {0} تا {1} در مجموع در {2} فایل ذخیره شد.",
+        "error_occurred": "یک خطا رخ داد: {}",
     },
     "fr": {
         "error_lang_detection": "Erreur lors de la détection de la langue du système : {}",
@@ -263,6 +287,18 @@ TRANSLATIONS = {
         "processing_complete": "✅ Завершено: Історія з {0} по {1} збережена усього в {2} файлах.",
         "error_occurred": "Сталася помилка: {}",
     },
+    "ur": {
+        "error_lang_detection": "سسٹم زبان کا پتہ لگانے میں خرابی: {}",
+        "file_not_found": "خرابی: فائل نہیں ملی: {}",
+        "json_decode_error": "JSON ڈی کوڈنگ کی خرابی: {}",
+        "start_processing": "🚀 پراسیسنگ شروع ہو رہی ہے: {} لوڈ ہو رہا ہے...",
+        "extracted_entries": "{0} اندراجات نکالے گئے، جن میں سے {1} Gemini کی تاریخ ہے۔",
+        "converting_markdown": "Markdown میں تبدیل کیا جا رہا ہے...",
+        "appended_to_file": "چیٹ کی تاریخ فائل میں شامل کر دی گئی ہے: {}",
+        "written_to_file": "چیٹ کی تاریخ فائل میں لکھ دی گئی ہے: {}",
+        "processing_complete": "✅ مکمل ہو گیا: تاریخ {0} سے {1} تک کل {2} فائلوں میں محفوظ کر دی گئی ہے۔",
+        "error_occurred": "ایک خرابی پیش آئی: {}",
+    },
     "vi": {
         "error_lang_detection": "Lỗi khi phát hiện ngôn ngữ hệ thống: {}",
         "file_not_found": "Lỗi: Không tìm thấy tệp: {}",
@@ -307,12 +343,16 @@ def get_system_language() -> str:
     try:
         lang, _ = locale.getdefaultlocale()
         if lang:
-            if lang.startswith("bn"):
+            if lang.startswith("ar"):
+                return "ar"
+            elif lang.startswith("bn"):
                 return "bn"
             elif lang.startswith("de"):
                 return "de"
             elif lang.startswith("es"):
                 return "es"
+            elif lang.startswith("fa"):
+                return "fa"
             elif lang.startswith("fr"):
                 return "fr"
             elif lang.startswith("hi"):
@@ -349,6 +389,8 @@ def get_system_language() -> str:
                 return "tr"
             elif lang.startswith("uk"):
                 return "uk"
+            elif lang.startswith("ur"):
+                return "ur"
             elif lang.startswith("vi"):
                 return "vi"
             elif lang and (lang.startswith("zh_CN") or lang.startswith("zh-Hans")):
