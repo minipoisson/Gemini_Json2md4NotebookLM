@@ -9,7 +9,7 @@ This script converts Gemini history data exported via Google Takeout (default: `
 - Automatically splits files considering NotebookLM's character limit (default: 1.5MB)
 - Supports incremental updates (managed with `last_entry_time.txt`)
 
-# Dependencies
+## Dependencies
 No external dependencies required (Standard Library only)
 
 ## Usage
