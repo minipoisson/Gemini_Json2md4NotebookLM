@@ -1,0 +1,7 @@
+Gemini_History-*.md
+MyActivity*.json
+last_entry_time.txt
+_reserved/
+# Pythonの一時ファイル
+__pycache__/
+*.py[cod]
