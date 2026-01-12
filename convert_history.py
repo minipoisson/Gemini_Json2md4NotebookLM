@@ -490,9 +490,15 @@ def extract_text_content(entry: dict[str, Any], last_entry_time_loaded: datetime
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Convert Google Takeout JSON to Markdown for NotebookLM")
-    parser.add_argument("--input_file", type=str, default="MyActivity.json", help="Path to input JSON file")
     parser.add_argument(
-        "--output_file", type=str, default="Gemini_History.md", help="Path to output Markdown file"
+        "--input_file", metavar="FILE", type=str, default="MyActivity.json", help="Path to input JSON file"
+    )
+    parser.add_argument(
+        "--output_file",
+        metavar="FILE",
+        type=str,
+        default="Gemini_History.md",
+        help="Path to output Markdown file",
     )
     parser.add_argument("--limit", type=int, default=1500000, help="Split file size limit in bytes")
 
