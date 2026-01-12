@@ -1,4 +1,7 @@
 # Gemini Json2md for NotebookLM
+![Python](https://img.shields.io/badge/python-3.9%2B-blue)
+![License](https://img.shields.io/github/license/minipoisson/Gemini_Json2md4NotebookLM)
+![Release](https://img.shields.io/github/v/release/minipoisson/Gemini_Json2md4NotebookLM)
 
 [日本語版READMEはこちら](README.ja.md)
 
