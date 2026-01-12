@@ -29,7 +29,7 @@ No external dependencies required (Standard Library only)
 
    Example:
    ```bash
-   python convert_history.py MyActivity.json Gemini_History.md --limit 2000000
+   python convert_history.py --input_file MyActivity.json --output_file Gemini_History.md --limit 2000000
    ```
 4. Upload the generated or updated Gemini_History-xx.md files to NotebookLM.
 
