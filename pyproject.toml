@@ -1,0 +1,35 @@
+[tool.ruff]
+# Python 3.9に対応（ユーザー様の環境に合わせました）
+target-version = "py39"
+
+# 1行の長さ。100〜110程度が、API呼び出しが多いコードでは読みやすいです
+line-length = 110
+
+[tool.ruff.lint]
+# 有効にするルールのグループを指定
+select = [
+    "E",   # pycodestyle (基本的な文法エラー)
+    "W",   # pycodestyle (警告)
+    "F",   # Pyflakes (未使用変数やタイポなどの論理ミス)
+    "I",   # isort (インポート順の自動整列)
+    "B",   # flake8-bugbear (バグになりやすい危うい書き方の検知)
+    "C4",  # flake8-comprehensions (リスト内包表記などの改善)
+    "UP",  # pyupgrade (古いPython構文の自動現代化)
+    "SIM", # flake8-simplify (コードをより単純にする提案)
+]
+
+# あえて無視するルール（Google API等で不便な場合）
+ignore = [
+    "E501", # 行の長さ制限は「フォーマッタ」が自動でやるので、エラーとしては出さない
+]
+
+[tool.ruff.lint.isort]
+# インポート順を整理する際の設定
+# 標準ライブラリ、外部ライブラリ、自前コードを明確に分けます
+section-order = ["future", "standard-library", "third-party", "first-party", "local-folder"]
+
+[tool.ruff.format]
+# フォーマッタの設定
+quote-style = "double"    # 文字列はダブルクォート " に統一（C#風）
+indent-style = "space"    # インデントはスペース
+skip-magic-trailing-comma = false # 末尾カンマを維持して改行を綺麗にする
