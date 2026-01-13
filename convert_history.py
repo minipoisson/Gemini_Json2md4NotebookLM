@@ -119,7 +119,7 @@ TRANSLATIONS = {
         "processing_complete": "✅ Completato: Cronologia salvata da {0} a {1} in un totale di {2} file.",
         "error_occurred": "Si è verificato un errore: {}",
     },
-    "it": {
+    "jp": {
         "error_lang_detection": "Errore durante il rilevamento della lingua di sistema: {}",
         "file_not_found": "Errore: File non trovato: {}",
         "json_decode_error": "Errore di decodifica JSON: {}",
