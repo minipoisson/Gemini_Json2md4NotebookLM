@@ -10,6 +10,37 @@ from typing import Any
 
 LAST_ENTRY_TIME_FILE = "last_entry_time.txt"
 
+# TRANSLATIONSに含まれる言語名からISO 639-1コードへのマッピング辞書
+LANG_MAP = {
+    "Arabic": "ar",
+    "Bengali": "bn",
+    "German": "de",
+    "English": "en",
+    "Spanish": "es",
+    "Persian": "fa",
+    "French": "fr",
+    "Hindi": "hi",
+    "Indonesian": "id",
+    "Japanese": "ja",
+    "Javanese": "jv",
+    "Korean": "ko",
+    "Marathi": "mr",
+    "Malay": "ms",
+    "Punjabi": "pa",
+    "Portuguese": "pt",
+    "Russian": "ru",
+    "Swahili": "sw",
+    "Tamil": "ta",
+    "Telugu": "te",
+    "Thai": "th",
+    "Turkish": "tr",
+    "Ukrainian": "uk",
+    "Urdu": "ur",
+    "Vietnamese": "vi",
+    "Chinese_China": "zh_CN",
+    "Chinese_Taiwan": "zh_TW",
+}
+
 TRANSLATIONS = {
     "ar": {
         "error_lang_detection": "خطأ أثناء اكتشاف لغة النظام: {}",
@@ -342,16 +373,21 @@ def get_system_language() -> str:
     """detect OS language setting"""
     try:
         lang_tuple = locale.getlocale()
-        lang = lang_tuple[0] if lang_tuple and lang_tuple[0] else None
-        if not lang:
+        if lang_tuple[0]:
+            lang_name = lang_tuple[0].split("_")[0]
+            lang_code = LANG_MAP.get(lang_name, lang_name[:2].lower())
+        else:
+            lang_code = None
+
+        if lang_code is None:
             return "en"
 
-        if lang.startswith("zh_CN") or lang.startswith("zh-Hans") or lang == "Chinese_China":
+        if lang_code == "zh_CN" or lang_code == "zh-Hans" or lang_name == "Chinese_China":
             return "zh_CN"
-        elif lang.startswith("zh_TW") or lang.startswith("zh-Hant") or lang == "Chinese_Taiwan":
+        elif lang_code == "zh_TW" or lang_code == "zh-Hant" or lang_name == "Chinese_Taiwan":
             return "zh_TW"
 
-        lang_code = lang.split("_")[0].split("-")[0].lower()
+        lang_code = lang_code.split("_")[0].split("-")[0].lower()
         if lang_code in TRANSLATIONS:
             return lang_code
         return "en"
