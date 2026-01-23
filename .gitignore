@@ -1,0 +1,7 @@
+.DS_Store
+Gemini_History-*.md
+MyActivity*.json
+last_entry_time.txt
+# Python cache files
+__pycache__/
+*.py[cod]
