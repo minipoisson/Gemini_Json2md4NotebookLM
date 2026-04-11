@@ -1,5 +1,18 @@
+"""
+Gemini_Json2md4NotebookLM
+Converts Gemini's exported MyActivity.json into sequential Markdown files
+suitable for NotebookLM ingestion.
+
+Usage:
+    python convert_history.py \
+        [--input_file MyActivity.json] \
+        [--output_file Gemini_History.md] \
+        [--limit 1000000]
+"""
+
 import argparse
 import contextlib
+import functools
 import html as html_module
 import json
 import locale
@@ -131,24 +144,24 @@ TRANSLATIONS = {
         "file_not_found": "त्रुटि: फ़ाइल नहीं मिली: {}",
         "json_decode_error": "JSON डिकोड त्रुटि: {}",
         "start_processing": "🚀 प्रसंस्करण शुरू हो रहा है: {} लोड हो रहा है...",
-        "extracted_entries": "Ditemukan {0} entri, di mana {1} adalah riwayat Gemini.",
-        "converting_markdown": "Mengonversi ke Markdown...",
-        "appended_to_file": "Riwayat obrolan ditambahkan ke file: {}",
-        "written_to_file": "Riwayat obrolan ditulis ke file: {}",
-        "processing_complete": "✅ Selesai: Riwayat disimpan dari {0} hingga {1} dalam total {2} file.",
-        "error_occurred": "Terjadi kesalahan: {}",
+        "extracted_entries": "{0} प्रविष्टियाँ निकाली गईं, जिनमें से {1} Gemini इतिहास हैं।",
+        "converting_markdown": "Markdown में परिवर्तित हो रहा है...",
+        "appended_to_file": "चैट इतिहास फ़ाइल में जोड़ा गया: {}",
+        "written_to_file": "चैट इतिहास फ़ाइल में लिखा गया: {}",
+        "processing_complete": "✅ पूर्ण: {0} से {1} तक का इतिहास कुल {2} फ़ाइलों में सहेजा गया।",
+        "error_occurred": "एक त्रुटि हुई: {}",
     },
     "id": {
         "error_lang_detection": "Error saat mendeteksi bahasa sistem: {}",
         "file_not_found": "Error: File tidak ditemukan: {}",
         "json_decode_error": "Error decode JSON: {}",
         "start_processing": "🚀 Memulai pemrosesan: Memuat {}...",
-        "extracted_entries": "Estratti {0} voci, di cui {1} sono cronologia di Gemini.",
-        "converting_markdown": "Conversione in Markdown...",
-        "appended_to_file": "Cronologia chat aggiunta al file: {}",
-        "written_to_file": "Cronologia chat scritta nel file: {}",
-        "processing_complete": "✅ Completato: Cronologia salvata da {0} a {1} in un totale di {2} file.",
-        "error_occurred": "Si è verificato un errore: {}",
+        "extracted_entries": "Diekstrak {0} entri, di antaranya {1} adalah riwayat Gemini.",
+        "converting_markdown": "Mengonversi ke Markdown...",
+        "appended_to_file": "Riwayat obrolan ditambahkan ke file: {}",
+        "written_to_file": "Riwayat obrolan ditulis ke file: {}",
+        "processing_complete": "✅ Selesai: Riwayat disimpan dari {0} hingga {1} dalam total {2} file.",
+        "error_occurred": "Terjadi kesalahan: {}",
     },
     "ja": {
         "error_lang_detection": "システム言語の検出中にエラーが発生しました: {}",
@@ -263,12 +276,12 @@ TRANSLATIONS = {
         "file_not_found": "பிழை: கோப்பு காணப்படவில்லை: {}",
         "json_decode_error": "JSON குறியாக்க பிழை: {}",
         "start_processing": "🚀 செயலாக்கம் தொடங்குகிறது: {} ஏற்றப்படுகிறது...",
-        "extracted_entries": "ดึงข้อมูล {0} รายการ ซึ่งมีประวัติของ Gemini จำนวน {1} รายการ",
-        "converting_markdown": "กำลังแปลงเป็น Markdown...",
-        "appended_to_file": "ประวัติการแชทถูกเพิ่มลงในไฟล์: {}",
-        "written_to_file": "ประวัติการแชทถูกเขียนลงในไฟล์: {}",
-        "processing_complete": "✅ เสร็จสิ้น: บันทึกประวัติจาก {0} ถึง {1} ลงในไฟล์ทั้งหมด {2} ไฟล์",
-        "error_occurred": "เกิดข้อผิดพลาด: {}",
+        "extracted_entries": "{0} உள்ளீடுகள் பிரித்தெடுக்கப்பட்டன, அவற்றில் {1} Gemini வரலாறு.",
+        "converting_markdown": "Markdown ஆக மாற்றுகிறது...",
+        "appended_to_file": "அரட்டை வரலாறு கோப்பில் இணைக்கப்பட்டது: {}",
+        "written_to_file": "அரட்டை வரலாறு கோப்பில் எழுதப்பட்டது: {}",
+        "processing_complete": "✅ முடிந்தது: {0} முதல் {1} வரையிலான வரலாறு மொத்தம் {2} கோப்புகளில் சேமிக்கப்பட்டது.",
+        "error_occurred": "ஒரு பிழை ஏற்பட்டது: {}",
     },
     "te": {
         "error_lang_detection": "సిస్టమ్ భాషను గుర్తించడంలో లోపం: {}",
@@ -369,6 +382,7 @@ TRANSLATIONS = {
 }
 
 
+@functools.lru_cache(maxsize=1)
 def get_system_language() -> str:
     """detect OS language setting"""
     try:
@@ -536,7 +550,7 @@ def main() -> None:
         default="Gemini_History.md",
         help="Path to output Markdown file",
     )
-    parser.add_argument("--limit", type=int, default=1500000, help="Split file size limit in bytes")
+    parser.add_argument("--limit", type=int, default=1000000, help="Split file size limit in bytes")
 
     args = parser.parse_args()
     input_json_filename: str = args.input_file
@@ -592,12 +606,14 @@ def main() -> None:
         def write_file(output_filename: str, header: str, texts: list[str], is_append_mode: bool) -> None:
             mode = "a" if is_append_mode else "w"
             with open(output_filename, mode, encoding="utf-8") as f:
-                f.write(header)
+                if not is_append_mode:
+                    f.write(header)
                 for text in texts:
                     f.write(text)
 
         texts = []
-        current_file_size += len(header.encode("utf-8"))
+        if not is_append_mode:
+            current_file_size += len(header.encode("utf-8"))
 
         for _, entry in enumerate(gemini_entries):
             dt, text = extract_text_content(entry, last_entry_time_loaded)
