@@ -38,3 +38,7 @@ No external dependencies required (Standard Library only)
 
 ## License
 See the LICENSE file in this repository for license details.
+
+## Related
+
+- [Claude_Json2md4NotebookLM](https://github.com/minipoisson/Claude_Json2md4NotebookLM) — Claude version of this tool
