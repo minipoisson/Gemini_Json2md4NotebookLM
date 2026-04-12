@@ -3,7 +3,7 @@
 ![License](https://img.shields.io/github/license/minipoisson/Gemini_Json2md4NotebookLM)
 ![Release](https://img.shields.io/github/v/release/minipoisson/Gemini_Json2md4NotebookLM)
 
-Google Takeout でエクスポートした Gemini の履歴データ (規定値は `MyActivity.json`) を、NotebookLM に読み込ませやすい Markdown 形式の連番のファイル（規定値は `Gemini_History-00.md`）に変換するスクリプトです。
+Google Takeout でエクスポートした Gemini の履歴データ (既定値は `MyActivity.json`) を、NotebookLM に読み込ませやすい Markdown 形式の連番のファイル（既定値は `Gemini_History-XX.md`）に変換するスクリプトです。
 
 ## 特徴
 - HTMLタグを除去し、Markdown形式に整形
