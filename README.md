@@ -42,3 +42,4 @@ See the LICENSE file in this repository for license details.
 ## Related
 
 - [Claude_Json2md4NotebookLM](https://github.com/minipoisson/Claude_Json2md4NotebookLM) — Claude version of this tool
+- [ChatGPT_Json2md4NotebookLM](https://github.com/minipoisson/ChatGPT_Json2md4NotebookLM) — ChatGPT version of this tool

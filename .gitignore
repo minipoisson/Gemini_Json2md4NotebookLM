@@ -5,3 +5,4 @@ last_entry_time.txt
 # Python cache files
 __pycache__/
 *.py[cod]
+*.lnk
