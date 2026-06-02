@@ -36,6 +36,18 @@ No external dependencies required (Standard Library only)
    ```
 4. Upload the generated or updated Gemini_History-xx.md files to NotebookLM.
 
+## Output Streams
+
+- Informational progress messages are written to stdout.
+- Error messages are written to stderr.
+- This separation helps when piping stdout to another command or file.
+- If `last_entry_time.txt` is invalid, empty, or otherwise unusable, a warning is sent to stderr and the run switches to full regeneration mode (not append mode).
+
+## Exit Codes
+
+- `0` - Processing completed successfully
+- `1` - Processing failed (input load failure, no processable data, or runtime error)
+
 ## License
 See the LICENSE file in this repository for license details.
 
