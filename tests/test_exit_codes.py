@@ -14,7 +14,8 @@ class ExitCodeTests(unittest.TestCase):
         stdout_buffer = io.StringIO()
         stderr_buffer = io.StringIO()
 
-        with patch("convert_history.load_json", return_value=[]), patch(
+        with patch("convert_history.get_system_language", return_value="en"), patch(
+            "convert_history.load_json", return_value=[]), patch(
             "argparse.ArgumentParser.parse_args"
         ) as mock_args:
             mock_args.return_value = argparse.Namespace(
@@ -32,7 +33,7 @@ class ExitCodeTests(unittest.TestCase):
         stdout_buffer = io.StringIO()
         stderr_buffer = io.StringIO()
 
-        with patch(
+        with patch("convert_history.get_system_language", return_value="en"), patch(
             "convert_history.load_json", side_effect=RuntimeError("Test error")
         ), patch("argparse.ArgumentParser.parse_args") as mock_args:
             mock_args.return_value = argparse.Namespace(
@@ -59,7 +60,8 @@ class ExitCodeTests(unittest.TestCase):
             stdout_buffer = io.StringIO()
             stderr_buffer = io.StringIO()
 
-            with patch("convert_history.load_json", return_value=[valid_entry]), patch(
+            with patch("convert_history.get_system_language", return_value="en"), patch(
+                "convert_history.load_json", return_value=[valid_entry]), patch(
                 "argparse.ArgumentParser.parse_args"
             ) as mock_args, patch(
                 "convert_history.LAST_ENTRY_TIME_FILE", last_entry_time_file
@@ -74,7 +76,6 @@ class ExitCodeTests(unittest.TestCase):
                     result = convert_history.main()
 
             self.assertEqual(result, 0)
-
 
 if __name__ == "__main__":
     unittest.main()

@@ -66,7 +66,8 @@ class LastEntryTimeHandlingTests(unittest.TestCase):
             stdout_buffer = io.StringIO()
             stderr_buffer = io.StringIO()
 
-            with patch("convert_history.load_json", return_value=[valid_entry]), patch(
+            with patch("convert_history.get_system_language", return_value="en"), patch(
+                "convert_history.load_json", return_value=[valid_entry]), patch(
                 "argparse.ArgumentParser.parse_args"
             ) as mock_args, patch(
                 "convert_history.LAST_ENTRY_TIME_FILE", last_entry_time_file
@@ -88,6 +89,56 @@ class LastEntryTimeHandlingTests(unittest.TestCase):
                 content = f.read()
             self.assertIn("# Gemini Chat History Archive", content)
             self.assertNotIn("stale content 01", content)
+
+    def test_remove_numbered_output_files_warns_and_aborts_when_remove_fails(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            output_file = os.path.join(tmpdir, "Gemini_History.md")
+            stale_file = os.path.join(tmpdir, "Gemini_History-01.md")
+
+            with open(stale_file, "w", encoding="utf-8") as f:
+                f.write("stale content")
+
+            base_name, ext = os.path.splitext(output_file)
+            stderr_buffer = io.StringIO()
+
+            with patch("convert_history.get_system_language", return_value="en"), patch(
+                "convert_history.os.remove", side_effect=OSError("remove failed")
+            ), redirect_stderr(stderr_buffer), self.assertRaises(RuntimeError):
+                convert_history.remove_numbered_output_files(base_name, ext)
+
+            stderr = stderr_buffer.getvalue()
+            self.assertIn("Warning: Failed to remove output file", stderr)
+            self.assertIn(stale_file, stderr)
+            self.assertIn("remove failed", stderr)
+
+    def test_remove_numbered_output_files_reports_partial_count_on_failure(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            output_file = os.path.join(tmpdir, "Gemini_History.md")
+            stale_file_01 = os.path.join(tmpdir, "Gemini_History-01.md")
+            stale_file_02 = os.path.join(tmpdir, "Gemini_History-02.md")
+
+            with open(stale_file_01, "w", encoding="utf-8") as f:
+                f.write("stale 01")
+            with open(stale_file_02, "w", encoding="utf-8") as f:
+                f.write("stale 02")
+
+            base_name, ext = os.path.splitext(output_file)
+            stderr_buffer = io.StringIO()
+
+            original_remove = os.remove
+
+            def remove_first_then_fail(path: str) -> None:
+                if path.endswith("-02.md"):
+                    raise OSError("remove failed")
+                original_remove(path)
+
+            with patch("convert_history.get_system_language", return_value="en"), patch(
+                "convert_history.os.remove", side_effect=remove_first_then_fail
+            ), redirect_stderr(stderr_buffer), self.assertRaises(RuntimeError):
+                convert_history.remove_numbered_output_files(base_name, ext)
+
+            stderr = stderr_buffer.getvalue()
+            self.assertIn("Removed 1 existing output file(s)", stderr)
 
 
 if __name__ == "__main__":

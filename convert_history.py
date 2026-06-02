@@ -1,4 +1,4 @@
-"""
+﻿"""
 Gemini_Json2md4NotebookLM
 Converts Gemini's exported MyActivity.json into sequential Markdown files
 suitable for NotebookLM ingestion.
@@ -22,6 +22,7 @@ from datetime import datetime, timezone
 from typing import Any
 
 LAST_ENTRY_TIME_FILE = "last_entry_time.txt"
+FORMAT_EXCEPTIONS = (IndexError, KeyError, ValueError, AttributeError, TypeError)
 
 # TRANSLATIONSに含まれる言語名からISO 639-1コードへのマッピング辞書
 LANG_MAP = {
@@ -70,6 +71,7 @@ TRANSLATIONS = {
         "warning_last_entry_time_invalid": "تحذير: طابع زمني غير صالح في last_entry_time.txt ({!r}). يتم الانتقال إلى وضع إعادة التوليد الكامل.",
         "warning_last_entry_time_naive": "تحذير: يحتوي last_entry_time.txt على طابع زمني بدون منطقة زمنية. سيتم اعتباره بتوقيت UTC.",
         "warning_removed_existing_outputs": "تحذير: تم إزالة {} من ملفات المخرجات الحالية قبل إعادة التوليد الكامل.",
+        "warning_failed_remove_output_file": "تحذير: فشل إزالة ملف المخرجات {}: {}",
     },
     "bn": {
         "error_lang_detection": "সিস্টেম ভাষা সনাক্তকরণে ত্রুটি: {}",
@@ -83,9 +85,10 @@ TRANSLATIONS = {
         "processing_complete": "✅ সম্পন্ন: {0} থেকে {1} পর্যন্ত ইতিহাস মোট {2} ফাইলে সংরক্ষণ করা হয়েছে।",
         "error_occurred": "একটি ত্রুটি ঘটেছে: {}",
         "warning_last_entry_time_empty": "सतर्कता: last_entry_time.txt ফাইলটি খালি। সম্পূর্ণ পুনরুৎপাদন মোডে পরিবর্তন করা হচ্ছে।",
-        "warning_last_entry_time_invalid": "सतर्कता: last_entry_time.txt-এ অবৈধ টাইমস্ট্যাম্প ({!r})। সম্পূর্ণ পুনরুৎপাদন মোডে পরিবর্তন করা হচ্ছে।",
-        "warning_last_entry_time_naive": "सतर्कता: last_entry_time.txt-এ টাইমজোন-বিহীন টাইমস্ট্যাম্প রয়েছে। UTC হিসেবে ধরে নেওয়া হচ্ছে।",
+        "warning_last_entry_time_invalid": "सतर्कता: last_entry_time.txt-এ অবৈধ টাইমস্ট্যাম্প ({!r})। সম্পূর্ণ পুনরুৎပাদন মোডে পরিবর্তন করা হচ্ছে।",
+        "warning_last_entry_time_naive": "सतर्कता: last_entry_time.txt-এ টাইমজোন-বিহীন টাইমস্ট্যাম্প রয়েছে। UTC হিসেবেধরে নেওয়া হচ্ছে।",
         "warning_removed_existing_outputs": "सतर्कता: সম্পূর্ণ পুনরুৎপাদনের আগে {}টি বিদ্যমান আউটপুট ফাইল মুছে ফেলা হয়েছে।",
+        "warning_failed_remove_output_file": "सतर्कता: আউটপুট ফাইল {} মুছে ফেলতে ব্যর্থ হয়েছে: {}",
     },
     "de": {
         "error_lang_detection": "Fehler bei der Erkennung der Systemsprache: {}",
@@ -102,6 +105,7 @@ TRANSLATIONS = {
         "warning_last_entry_time_invalid": "Warnung: Ungültiger Zeitstempel in last_entry_time.txt ({!r}). Wechsel in den Modus zur vollständigen Regenerierung.",
         "warning_last_entry_time_naive": "Warnung: last_entry_time.txt enthält einen Zeitstempel ohne Zeitzone. UTC wird angenommen.",
         "warning_removed_existing_outputs": "Warnung: {} vorhandene Ausgabedatei(en) vor der vollständigen Regenerierung entfernt.",
+        "warning_failed_remove_output_file": "Warnung: Ausgabedatei {} konnte nicht entfernt werden: {}",
     },
     "en": {
         "error_lang_detection": "Error while detecting system language: {}",
@@ -118,6 +122,7 @@ TRANSLATIONS = {
         "warning_last_entry_time_invalid": "Warning: Invalid timestamp in last_entry_time.txt ({!r}). Switching to full regeneration mode.",
         "warning_last_entry_time_naive": "Warning: last_entry_time.txt has a timezone-naive timestamp. Assuming UTC.",
         "warning_removed_existing_outputs": "Warning: Removed {} existing output file(s) before full regeneration.",
+        "warning_failed_remove_output_file": "Warning: Failed to remove output file {}: {}",
     },
     "es": {
         "error_lang_detection": "Error al detectar el idioma del sistema: {}",
@@ -128,12 +133,13 @@ TRANSLATIONS = {
         "converting_markdown": "Convirtiendo a Markdown...",
         "appended_to_file": "Historiales de chat agregados al archivo: {}",
         "written_to_file": "Historiales de chat escritos en el archivo: {}",
-        "processing_complete": "✅ Completado: Historial guardado desde {0} hasta {1} en un total de {2} archivos.",
+        "processing_complete": "✅ Completado: Historial guardado desde {0} hasta {1} en un total of {2} archivos.",
         "error_occurred": "Ocurrió un error: {}",
         "warning_last_entry_time_empty": "Advertencia: last_entry_time.txt está vacío. Cambiando al modo de regeneración completa.",
         "warning_last_entry_time_invalid": "Advertencia: Marca de tiempo inválida en last_entry_time.txt ({!r}). Cambiando al modo de regeneración completa.",
         "warning_last_entry_time_naive": "Advertencia: last_entry_time.txt tiene una marca de tiempo sin zona horaria. Se asume UTC.",
         "warning_removed_existing_outputs": "Advertencia: Se eliminaron {} archivos de salida existentes antes de la regeneración completa.",
+        "warning_failed_remove_output_file": "Advertencia: No se pudo eliminar el archivo de salida {}: {}",
     },
     "fa": {
         "error_lang_detection": "خطا در شناسایی زبان سیستم: {}",
@@ -150,6 +156,7 @@ TRANSLATIONS = {
         "warning_last_entry_time_invalid": "هشدار: برچسب زمان در last_entry_time.txt نامعتبر است ({!r}). تغییر به حالت بازسازی کامل.",
         "warning_last_entry_time_naive": "هشدار: برچسب زمان در last_entry_time.txt فاقد اطلاعات منطقه زمانی است. بر پایه UTC فرض می‌شود.",
         "warning_removed_existing_outputs": "هشدار: پاکسازی {} فایل خروجی موجود پیش از بازسازی کامل انجام شد.",
+        "warning_failed_remove_output_file": "هشدار: حذف فایل خروجی {} با خطا مواجه شد: {}",
     },
     "fr": {
         "error_lang_detection": "Erreur lors de la détection de la langue du système : {}",
@@ -166,6 +173,7 @@ TRANSLATIONS = {
         "warning_last_entry_time_invalid": "Avertissement : Horodatage non valide dans last_entry_time.txt ({!r}). Passage en mode de régénération complète.",
         "warning_last_entry_time_naive": "Avertissement : last_entry_time.txt contient un horodatage sans fuseau horaire. UTC sera supposé.",
         "warning_removed_existing_outputs": "Avertissement : {} fichier(s) de sortie existant(s) supprimé(s) avant la régénération complète.",
+        "warning_failed_remove_output_file": "Avertissement : Échec de la suppression du fichier de sortie {} : {}",
     },
     "hi": {
         "error_lang_detection": "त्रुटि: सिस्टम भाषा का पता लगाने में समस्या: {}",
@@ -182,6 +190,7 @@ TRANSLATIONS = {
         "warning_last_entry_time_invalid": "चेतावनी: last_entry_time.txt में अमान्य टाइमस्टैम्प ({!r}) है। पूर्ण पुनर्जनन मोड पर स्विच किया जा रहा है।",
         "warning_last_entry_time_naive": "चेतावनी: last_entry_time.txt में टाइमज़ोन-रहित टाइमस्टैम्प है। इसे UTC माना जा रहा है।",
         "warning_removed_existing_outputs": "चेतावनी: पूर्ण पुनर्जनन से पहले {} मौजूदा आउटपुट फ़ाइलें हटा दी गई हैं।",
+        "warning_failed_remove_output_file": "चेतावनी: आउटपुट फ़ाइल {} को हटाने में विफल: {}",
     },
     "id": {
         "error_lang_detection": "Error saat mendeteksi bahasa sistem: {}",
@@ -198,6 +207,7 @@ TRANSLATIONS = {
         "warning_last_entry_time_invalid": "Peringatan: Timestamp tidak valid di last_entry_time.txt ({!r}). Beralih ke mode regenerasi penuh.",
         "warning_last_entry_time_naive": "Peringatan: last_entry_time.txt memiliki timestamp tanpa informasi zona waktu. Diasumsikan sebagai UTC.",
         "warning_removed_existing_outputs": "Peringatan: Menghapus {} file output yang ada sebelum melakukan regenerasi penuh.",
+        "warning_failed_remove_output_file": "Peringatan: Gagal menghapus file output {}: {}",
     },
     "ja": {
         "error_lang_detection": "システム言語の検出中にエラーが発生しました: {}",
@@ -214,6 +224,7 @@ TRANSLATIONS = {
         "warning_last_entry_time_invalid": "警告: last_entry_time.txt のタイムスタンプが不正です（{!r}）。全件再生成モードに切り替えます。",
         "warning_last_entry_time_naive": "警告: last_entry_time.txt のタイムスタンプにタイムゾーン情報がありません。UTC として扱います。",
         "warning_removed_existing_outputs": "警告: 全件再生成の前に既存の出力ファイル {} 件を削除しました。",
+        "warning_failed_remove_output_file": "警告: 出力ファイル {} の削除に失敗しました: {}",
     },
     "jv": {
         "error_lang_detection": "Kesalahan saat mendeteksi bahasa sistem: {}",
@@ -230,6 +241,7 @@ TRANSLATIONS = {
         "warning_last_entry_time_invalid": "Pèngetan: Timestamp ora sah ing last_entry_time.txt ({!r}). Ngalih menyang mode regenerasi lengkap.",
         "warning_last_entry_time_naive": "Pèngetan: last_entry_time.txt nduweni timestamp tanpa zona wektu. Dianggep minangka UTC.",
         "warning_removed_existing_outputs": "Pèngetan: Busak {} berkas output sing wis ana sadurunge regenerasi lengkap.",
+        "warning_failed_remove_output_file": "Pèngetan: Gagal mbusak berkas output {}: {}",
     },
     "ko": {
         "error_lang_detection": "시스템 언어 설정 감지 중 오류 발생: {}",
@@ -246,6 +258,7 @@ TRANSLATIONS = {
         "warning_last_entry_time_invalid": "경고: last_entry_time.txt의 타임스탬프가 올바르지 않습니다 ({!r}). 전체 재생성 모드로 전환합니다.",
         "warning_last_entry_time_naive": "경고: last_entry_time.txt에 시간대(timezone) 정보가 없는 타임스탬프가 포함되어 있습니다. UTC로 간주합니다.",
         "warning_removed_existing_outputs": "경고: 전체 재생성 전에 기존 출력 파일 {}개를 삭제했습니다.",
+        "warning_failed_remove_output_file": "경고: 출력 파일 {} 삭제에 실패했습니다: {}",
     },
     "mr": {
         "error_lang_detection": "त्रुटी: सिस्टम भाषा ओळखण्यात समस्या: {}",
@@ -257,11 +270,12 @@ TRANSLATIONS = {
         "appended_to_file": "चॅट इतिहास फाइलमध्ये जोडला गेला: {}",
         "written_to_file": "चॅट इतिहास फाइलमध्ये लिहिला गेला: {}",
         "processing_complete": "✅ पूर्ण झाले: इतिहास {0} पासून {1} पर्यंत एकूण {2} फाइलांमध्ये जतन केला गेला.",
-        "error_occurred": "एक त्रुटी आली आहे: {}",
+        "error_occurred": "एक त्रुटी आलेली आहे: {}",
         "warning_last_entry_time_empty": "तंबी: last_entry_time.txt रिकामी आहे. पूर्ण पुनरुत्पादन (full regeneration) मोडवर स्विच करत आहे.",
         "warning_last_entry_time_invalid": "तंबी: last_entry_time.txt मध्ये अवैध टाइमस्टँप ({!r}) आहे. पूर्ण पुनरुत्पादन मोडवर स्विच करत आहे.",
         "warning_last_entry_time_naive": "तंबी: last_entry_time.txt मध्ये टाइमझोन-विरहित टाइमस्टँप आहे. UTC मानले जात आहे.",
         "warning_removed_existing_outputs": "तंबी: पूर्ण पुनरुत्पादनापूर्वी {} विद्यमान आउटपुट फाइल्स हटवल्या गेल्या आहेत.",
+        "warning_failed_remove_output_file": "तंबी: आउटपुट फाइल {} हटवण्यात अपयश आले: {}",
     },
     "ms": {
         "error_lang_detection": "Ralat semasa mengesan bahasa sistem: {}",
@@ -278,6 +292,7 @@ TRANSLATIONS = {
         "warning_last_entry_time_invalid": "Amaran: Penanda masa tidak sah dalam last_entry_time.txt ({!r}). Beralih ke mod regenerasi penuh.",
         "warning_last_entry_time_naive": "Amaran: last_entry_time.txt mempunyai penanda masa tanpa zon masa. Mengandalkan UTC.",
         "warning_removed_existing_outputs": "Amaran: Mengeluarkan {} fail output sedia ada sebelum regenerasi penuh.",
+        "warning_failed_remove_output_file": "Amaran: Gagal mengosongkan/membuang fail output {}: {}",
     },
     "pa": {
         "error_lang_detection": "ਸਿਸਟਮ ਭਾਸ਼ਾ ਦਾ ਪਤਾ ਲਗਾਉਂਦੇ ਸਮੇਂ ਤਰੁੱਟੀ: {}",
@@ -288,12 +303,13 @@ TRANSLATIONS = {
         "converting_markdown": "Markdown ਵਿੱਚ ਬਦਲ ਰਿਹਾ ਹੈ...",
         "appended_to_file": "ਚੈਟ ਇਤਿਹਾਸ ਫਾਈਲ ਵਿੱਚ ਸ਼ਾਮਲ ਕੀਤਾ ਗਿਆ: {}",
         "written_to_file": "ਚੈਟ ਇਤਿਹਾਸ ਫਾਈਲ ਵਿੱਚ ਲਿਖਿਆ ਗਿਆ: {}",
-        "processing_complete": "✅ ਮੁਕੰਮਲ: ਇਤਿਹਾਸ {0} ਤੋਂ {1} ਤੱਕ ਕੁੱਲ {2} ਫਾਈਲਾਂ ਵਿੱਚ ਸੁਰੱਖਿਅਤ ਕੀਤਾ ਗਿਆ।",
+        "processing_complete": "✅ ਮੁਕੰਮล: ਇਤਿਹਾਸ {0} ਤੋਂ {1} ਤੱਕ ਕੁੱਲ {2} ਫਾਈਲਾਂ ਵਿੱਚ ਸੁਰੱਖਿਅਤ ਕੀਤਾ ਗਿਆ।",
         "error_occurred": "ਇੱਕ ਤਰੁੱਟੀ ਆਈ: {}",
         "warning_last_entry_time_empty": "ਚੇਤਾਵਨੀ: last_entry_time.txt ਖਾਲੀ ਹੈ। ਪੂਰੀ ਰੀਜਨਰੇਸ਼ਨ (full regeneration) ਮੋਡ 'ਤੇ ਸਵਿਚ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ।",
         "warning_last_entry_time_invalid": "ਚੇਤਾਵਨੀ: last_entry_time.txt ਵਿੱਚ ਅਵੈਧ ਟਾਈਮਸਟੈਂਪ ({!r}) ਹੈ। ਪੂਰੀ ਰੀਜਨਰੇਸ਼ਨ ਮੋਡ 'ਤੇ ਸਵਿਚ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ।",
-        "warning_last_entry_time_naive": "ਚੇਤਾਵਨੀ: last_entry_time.txt ਵਿੱਚ ਟਾਈਮਜ਼ੋਨ-ਰਹਿਤ ਟਾਈਮਸਟੈਂਪ ਹੈ। ਇਸਨੂੰ UTC ਮੰਨਿਆ ਜਾ ਰਿਹਾ ਹੈ।",
+        "warning_last_entry_time_naive": "ਚੇਤਾਵਨੀ: last_entry_time.txt ਵਿੱਚ ਟਾਈਮਜ਼ੋਨ-ਰਹਿਤ ਟਾਈਮਸਟੈਂਪ ਹੈ। ਇਸਨੂੰ UTC ਮੰਨਿਆ ਜਾ ਰਿਹਾ है।",
         "warning_removed_existing_outputs": "ਚੇਤਾਵਨੀ: ਪੂਰੀ ਰੀਜਨਰੇਸ਼ਨ ਤੋਂ ਪਹਿਲਾਂ {} ਮੌਜੂਦਾ ਆਉਟਪੁੱਟ ਫਾਈਲਾਂ ਨੂੰ ਹਟਾ ਦਿੱਤਾ ਗਿਆ ਹੈ।",
+        "warning_failed_remove_output_file": "ਚੇਤਾਵਨੀ: ਆਉਟਪੁੱਟ ਫਾਈਲ {} ਨੂੰ ਹਟਾਉਣ ਵਿੱਚ ਅਸਫਲ: {}",
     },
     "pt": {
         "error_lang_detection": "Erro ao detectar o idioma do sistema: {}",
@@ -309,7 +325,8 @@ TRANSLATIONS = {
         "warning_last_entry_time_empty": "Aviso: last_entry_time.txt está vazio. Alternando para o modo de regeneração completa.",
         "warning_last_entry_time_invalid": "Aviso: Carimbo de data/hora inválido em last_entry_time.txt ({!r}). Alternando para o modo de regeneração completa.",
         "warning_last_entry_time_naive": "Aviso: last_entry_time.txt possui um carimbo de data/hora sem fuso horário. Assumindo UTC.",
-        "warning_removed_existing_outputs": "Aviso: Removido(s) {} arquivo(s) de saída existente(s) antes da regeneración completa.",
+        "warning_removed_existing_outputs": "Aviso: Removido(s) {} arquivo(s) de saída existente(s) antes da 'regeneração completa.",
+        "warning_failed_remove_output_file": "Aviso: Falha ao remover o arquivo de saída {}: {}",
     },
     "ru": {
         "error_lang_detection": "Ошибка при определении языка системы: {}",
@@ -326,6 +343,7 @@ TRANSLATIONS = {
         "warning_last_entry_time_invalid": "Предупреждение: Некорректная метка времени в last_entry_time.txt ({!r}). Переключение в режим полной регенерации.",
         "warning_last_entry_time_naive": "Предупреждение: Метка времени в last_entry_time.txt не содержит указания часового пояса. Предполагается UTC.",
         "warning_removed_existing_outputs": "Предупреждение: Удалено {} существующих выходных файлов перед полной регенерацией.",
+        "warning_failed_remove_output_file": "Предупреждение: Не удалось удалить выходной файл {}: {}",
     },
     "sw": {
         "error_lang_detection": "Hitilafu wakati wa kugundua lugha ya mfumo: {}",
@@ -342,6 +360,7 @@ TRANSLATIONS = {
         "warning_last_entry_time_invalid": "Onyo: Alama ya muda si halali katika last_entry_time.txt ({!r}). Inabadilisha kwenda hali ya uzalishaji upya kikamilifu.",
         "warning_last_entry_time_naive": "Onyo: last_entry_time.txt ina alama ya muda isiyo na eneo la muda. Inachukuliwa kama UTC.",
         "warning_removed_existing_outputs": "Onyo: Faili {} zilizopo za matokeo zimeondolewa kabla ya uzalishaji upya kikamilifu.",
+        "warning_failed_remove_output_file": "Onyo: Imeshindwa kuondoa faili la matokeo {}: {}",
     },
     "ta": {
         "error_lang_detection": "சிஸ்டம் மொழியை கண்டறிதலில் பிழை: {}",
@@ -354,10 +373,11 @@ TRANSLATIONS = {
         "written_to_file": "அரட்டை வரலாறு கோப்பில் எழுதப்பட்டது: {}",
         "processing_complete": "✅ முடிந்தது: {0} முதல் {1} வரையிலான வரலாறு மொத்தம் {2} கோப்புகளில் சேமிக்கப்பட்டது.",
         "error_occurred": "ஒரு பிழை ஏற்பட்டது: {}",
-        "warning_last_entry_time_empty": "எச்சரிக்கை: last_entry_time.txt காலியாக உள்ளது. முழுமையான மறுஉருவாக்க பயன்முறைக்கு மாறுகிறது.",
+        "warning_last_entry_time_empty": "எச்சரிக்கை: last_entry_time.txt காலியாக உள்ளது.முழுமையான மறுஉருவாக்க பயன்முறைக்கு மாறுகிறது.",
         "warning_last_entry_time_invalid": "எச்சரிக்கை: last_entry_time.txt இல் தவறான நேரமுத்திரை ({!r}). முழுமையான மறுஉருவாக்க பயன்முறைக்கு மாறுகிறது.",
         "warning_last_entry_time_naive": "எச்சரிக்கை: last_entry_time.txt இல் உள்ள நேரமுத்திரையில் நேரமண்டல தகவல் இல்லை. UTC எனக் கருதப்படுகிறது.",
         "warning_removed_existing_outputs": "எச்சரிக்கை: முழுமையான மறுஉருவாக்கத்திற்கு முன் ஏற்கனவே உள்ள நாடுகளில் உள்ள {} வெளியீட்டுக் கோப்புகள் நீக்கப்பட்டன.",
+        "warning_failed_remove_output_file": "எச்சரிக்கை: வெளியீட்டுக் கோப்பை {} நீக்குவதில் தோல்வி: {}",
     },
     "te": {
         "error_lang_detection": "సిస్టమ్ భాషను గుర్తించడంలో లోపం: {}",
@@ -373,7 +393,8 @@ TRANSLATIONS = {
         "warning_last_entry_time_empty": "హెచ్చరిక: last_entry_time.txt ఖాళీగా ఉంది. పూర్తి పునరుత్పత్తి (full regeneration) మోడ్‌కు మారుతోంది.",
         "warning_last_entry_time_invalid": "హెచ్చరిక: last_entry_time.txt లో చెల్లని టైమ్‌స్టాంప్ ({!r}) ఉంది. పూర్తి పునరుత్పత్తి మోడ్‌కు మారుతోంది.",
         "warning_last_entry_time_naive": "హెచ్చరిక: last_entry_time.txt లోని టైమ్‌స్టాంప్‌కు టైమ్‌జోన్ సమాచారం లేదు. UTC గా భావించబడుతుంది.",
-        "warning_removed_existing_outputs": "హెచ్చరిక: పూర్తి పునరుత్పత్తికి ముందు ఇప్పటికే ఉన్న {} అవుట్‌పుట్ ఫైల్‌లు తీసివేయబడ్డాయి.",
+        "warning_removed_existing_outputs": "హెచ్చరిక: పూర్తి పుനరుత్పత్తికి ముందు ఇప్పటికే ఉన్న {} అవుట్‌పుట్ ఫైల్‌లు తీసివేయబడ్డాయి.",
+        "warning_failed_remove_output_file": "హెచ్చరిక: అవుట్‌పుట్ ఫైల్ {}ని తీసివేయడంలో విఫలమైంది: {}",
     },
     "th": {
         "error_lang_detection": "เกิดข้อผิดพลาดขณะตรวจจับภาษาระบบ: {}",
@@ -390,6 +411,7 @@ TRANSLATIONS = {
         "warning_last_entry_time_invalid": "คำเตือน: การประทับเวลาใน last_entry_time.txt ไม่ถูกต้อง ({!r}) กำลังเปลี่ยนเป็นโหมดสร้างใหม่ทั้งหมด",
         "warning_last_entry_time_naive": "คำเตือน: การประทับเวลาใน last_entry_time.txt ไม่มีข้อมูลเขตเวลา จะถือว่าเป็นเวลา UTC",
         "warning_removed_existing_outputs": "คำเตือน: ลบไฟล์เอาต์พุตที่มีอยู่เดิมจำนวน {} ไฟล์ ก่อนเริ่มการสร้างใหม่ทั้งหมด",
+        "warning_failed_remove_output_file": "คำเตือน: ไม่สามารถลบไฟล์เอาต์พุตได้ {}: {}",
     },
     "tr": {
         "error_lang_detection": "Sistem dili algılanırken hata oluştu: {}",
@@ -406,6 +428,7 @@ TRANSLATIONS = {
         "warning_last_entry_time_invalid": "Uyarı: last_entry_time.txt dosyasındaki zaman damgası geçersiz ({!r}). Tam adımlı yeniden oluşturma moduna geçiliyor.",
         "warning_last_entry_time_naive": "Uyarı: last_entry_time.txt dosyasındaki zaman damgası saat dilimi bilgisi içermiyor. UTC olduğu varsayılıyor.",
         "warning_removed_existing_outputs": "Uyarı: Tam adımlı yeniden oluşturma öncesinde mevcut {} çıktı dosyası silindi.",
+        "warning_failed_remove_output_file": "Uyarı: {} çıktı dosyası silinemedi: {}",
     },
     "uk": {
         "error_lang_detection": "Помилка під час визначення мови системи: {}",
@@ -418,10 +441,11 @@ TRANSLATIONS = {
         "written_to_file": "Історія чату записана у файл: {}",
         "processing_complete": "✅ Завершено: Історія з {0} по {1} збережена усього в {2} файлах.",
         "error_occurred": "Сталася помилка: {}",
-        "warning_last_entry_time_empty": "Попередження: Файл last_entry_time.txt порожній. Переключення в режим повної регенерації.",
-        "warning_last_entry_time_invalid": "Попередження: Некоректна мітка часу в last_entry_time.txt ({!r}). Переключення в режим повної регенерації.",
+        "warning_last_entry_time_empty": "Попередження: Файл last_entry_time.txt порожній. Переключення в режим повної регенерации.",
+        "warning_last_entry_time_invalid": "Попередження: Некоректная мітка часу в last_entry_time.txt ({!r}). Переключення в режим повної регенерації.",
         "warning_last_entry_time_naive": "Попередження: Мітка часу в last_entry_time.txt не містить інформації про часовий пояс. Припускається UTC.",
         "warning_removed_existing_outputs": "Попередження: Видалено {} існуючих вихідних файлів перед повною регенерацією.",
+        "warning_failed_remove_output_file": "Попередження: Не вдалося видалити вихідний файл {}: {}",
     },
     "ur": {
         "error_lang_detection": "سسٹم زبان کا پتہ لگانے में خرابی: {}",
@@ -431,13 +455,14 @@ TRANSLATIONS = {
         "extracted_entries": "{0} اندراجات نکالے گئے، جن میں سے {1} Gemini کی تاریخ ہے۔",
         "converting_markdown": "Markdown میں تبدیل کیا جا رہا ہے...",
         "appended_to_file": "چیٹ کی تاریخ فائل میں شامل کر دی گئی ہے: {}",
-        "written_to_file": "چیٹ کی تاریخ فائل میں لکھ دی گئی ہے: {}",
-        "processing_complete": "✅ مکمل ہو گیا: تاریخ {0} سے {1} تک کل {2} فائلوں میں محفوظ کر دی گئی ہے۔",
+        "written_to_file": "چیٹ کی تاریخ فائل में لکھ دی گئی ہے: {}",
+        "processing_complete": "✅ مکمل ہو گیا: تاریخ {0} سے {1} तक کل {2} فائلوں میں محفوظ کر دی گئی ہے۔",
         "error_occurred": "ایک خرابی پیش آئی: {}",
         "warning_last_entry_time_empty": "انتباہ: last_entry_time.txt خالی ہے۔ مکمل بحالی (full regeneration) کے موڈ پر منتقل کیا جا رہا ہے۔",
         "warning_last_entry_time_invalid": "انتباہ: last_entry_time.txt میں غلط ٹائم اسٹیمپ ہے ({!r})۔ مکمل بحالی کے موڈ پر منتقل کیا جا رہا ہے۔",
         "warning_last_entry_time_naive": "انتباہ: last_entry_time.txt میں ٹائم زون کے بغیر ٹائم اسٹیمپ ہے۔ اسے UTC فرض کیا جا رہا ہے۔",
-        "warning_removed_existing_outputs": "انتباہ: مکمل بحالی سے پہلے موصوفہ {} آؤٹ پٹ فائلیں ہٹا دی گئی ہیں۔",
+        "warning_removed_existing_outputs": "انتباہ: مکمل بحالی سے پہلے موصوفہ {} آؤٹ پٹ فائلیں ہٹا دی گئی ہے۔",
+        "warning_failed_remove_output_file": "انتباہ: آؤٹ پٹ فائل {} کو ہٹانے میں ناکامی ہوئی: {}",
     },
     "vi": {
         "error_lang_detection": "Lỗi khi phát hiện ngôn ngữ hệ thống: {}",
@@ -454,6 +479,7 @@ TRANSLATIONS = {
         "warning_last_entry_time_invalid": "Cảnh báo: Dấu thời gian không hợp lệ trong last_entry_time.txt ({!r}). Chuyển sang chế độ tái tạo toàn bộ.",
         "warning_last_entry_time_naive": "Cảnh báo: last_entry_time.txt có dấu thời gian không chứa múi giờ. Giả định là UTC.",
         "warning_removed_existing_outputs": "Cảnh báo: Đã xóa {} tệp đầu ra hiện có trước khi tái tạo toàn bộ.",
+        "warning_failed_remove_output_file": "Cảnh báo: Không thể xóa tệp đầu ra {}: {}",
     },
     "zh_CN": {
         "error_lang_detection": "检测系统语言时出错：{}",
@@ -470,6 +496,7 @@ TRANSLATIONS = {
         "warning_last_entry_time_invalid": "警告：last_entry_time.txt 中的时间戳无效（{!r}），已切换为全量重新生成模式。",
         "warning_last_entry_time_naive": "警告：last_entry_time.txt 中的时间戳缺少时区信息，将按 UTC 处理。",
         "warning_removed_existing_outputs": "警告：已在全量重新生成前删除 {} 个既有输出文件。",
+        "warning_failed_remove_output_file": "警告：未能删除输出文件 {}：{}",
     },
     "zh_TW": {
         "error_lang_detection": "檢測系統語言時出錯：{}",
@@ -486,6 +513,7 @@ TRANSLATIONS = {
         "warning_last_entry_time_invalid": "警告：last_entry_time.txt 中的時間戳無效（{!r}），已切換為全量重新產生模式。",
         "warning_last_entry_time_naive": "警告：last_entry_time.txt 中的時間戳缺少時區資訊，將視為 UTC。",
         "warning_removed_existing_outputs": "警告：已在全量重新產生前刪除 {} 個既有輸出檔。",
+        "warning_failed_remove_output_file": "警告：未能刪除輸出檔 {}：{}",
     },
 }
 
@@ -532,9 +560,23 @@ def translate_for_lang(lang: str, key: str, *args: Any) -> str:
     if args:
         try:
             return msg.format(*args)
-        except IndexError:
-            # Safety measure in case the number of placeholders and variables do not match
-            return msg
+        except FORMAT_EXCEPTIONS as format_error:
+            print(
+                f"Warning: Failed to format translation key={key!r} lang={lang!r}: {format_error}",
+                file=sys.stderr,
+            )
+            fallback_msg = TRANSLATIONS["en"].get(key, key)
+            try:
+                return fallback_msg.format(*args)
+            except FORMAT_EXCEPTIONS as fallback_error:
+                print(
+                    (
+                        "Warning: English fallback also failed to format "
+                        f"key={key!r}: {fallback_error}"
+                    ),
+                    file=sys.stderr,
+                )
+                return msg
     return msg
 
 
@@ -612,14 +654,22 @@ def remove_numbered_output_files(base_name: str, ext: str) -> int:
     """Remove previously generated numbered output files and return count."""
     removed = 0
     base_leaf = os.path.basename(base_name)
-    pattern = re.compile(rf"^{re.escape(base_leaf)}-\d{{2}}{re.escape(ext)}$")
+    pattern = re.compile(rf"^{re.escape(base_leaf)}-\d+{re.escape(ext)}$")
 
-    for entry in os.listdir(os.path.dirname(base_name) or "."):
-        if not pattern.match(entry):
-            continue
-        file_path = os.path.join(os.path.dirname(base_name), entry) if os.path.dirname(base_name) else entry
-        os.remove(file_path)
-        removed += 1
+    try:
+        for entry in sorted(os.listdir(os.path.dirname(base_name) or ".")):
+            if not pattern.match(entry):
+                continue
+            file_path = os.path.join(os.path.dirname(base_name), entry) if os.path.dirname(base_name) else entry
+            try:
+                os.remove(file_path)
+                removed += 1
+            except OSError as remove_error:
+                print_warning("warning_failed_remove_output_file", file_path, remove_error)
+                raise RuntimeError("Aborting full regeneration because an output file could not be removed.") from remove_error
+    finally:
+        if removed:
+            print_warning("warning_removed_existing_outputs", removed)
 
     return removed
 
@@ -767,9 +817,7 @@ def main() -> int:
         file_index = 1
         is_append_mode = False
         if force_full_regeneration:
-            removed_count = remove_numbered_output_files(base_name, ext)
-            if removed_count:
-                print_warning("warning_removed_existing_outputs", removed_count)
+            remove_numbered_output_files(base_name, ext)
         else:
             while os.path.exists(get_output_filename(file_index)):
                 is_append_mode = True
@@ -797,7 +845,7 @@ def main() -> int:
         if not is_append_mode:
             current_file_size += len(header.encode("utf-8"))
 
-        for _, entry in enumerate(gemini_entries):
+        for entry in gemini_entries:
             dt, text = extract_text_content(entry, last_entry_time_loaded)
             if text == "":
                 continue
