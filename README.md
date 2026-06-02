@@ -28,7 +28,7 @@ No external dependencies required (Standard Library only)
    ```
    - `--input_file` (default: MyActivity.json): The Google Takeout JSON file to import
    - `--output_file` (default: Gemini_History.md): The output Markdown file name (sequentially numbered)
-   - `--limit` (default: 1500000): Maximum file size for splitting (in bytes)
+   - `--limit` (default: 1000000): Maximum file size for splitting (in bytes)
 
    Example:
    ```bash

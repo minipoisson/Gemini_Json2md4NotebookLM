@@ -387,23 +387,36 @@ def get_system_language() -> str:
     """detect OS language setting"""
     try:
         lang_tuple = locale.getlocale()
-        if lang_tuple[0]:
-            lang_name = lang_tuple[0].split("_")[0]
-            lang_code = LANG_MAP.get(lang_name, lang_name[:2].lower())
-        else:
-            lang_code = None
-
-        if lang_code is None:
+        raw_locale = (lang_tuple[0] or "").strip()
+        if not raw_locale:
             return "en"
 
-        if lang_code == "zh_CN" or lang_code == "zh-Hans" or lang_name == "Chinese_China":
+        normalized_locale = raw_locale.replace("-", "_")
+        normalized_locale_lower = normalized_locale.lower()
+
+        # Keep language + region/script for Chinese variants before reducing to language only.
+        if normalized_locale_lower in {"zh_cn", "zh_hans", "chinese_china"}:
             return "zh_CN"
-        elif lang_code == "zh_TW" or lang_code == "zh-Hant" or lang_name == "Chinese_Taiwan":
+        if normalized_locale_lower in {"zh_tw", "zh_hant", "chinese_taiwan"}:
             return "zh_TW"
 
-        lang_code = lang_code.split("_")[0].split("-")[0].lower()
+        if normalized_locale in TRANSLATIONS:
+            return normalized_locale
+
+        mapped = LANG_MAP.get(raw_locale) or LANG_MAP.get(normalized_locale)
+        if mapped in TRANSLATIONS:
+            return mapped
+
+        lang_code = normalized_locale_lower.split("_")[0]
         if lang_code in TRANSLATIONS:
             return lang_code
+
+        # Handle locale strings such as "English_United States".
+        language_name = normalized_locale.split("_")[0]
+        mapped_from_language_name = LANG_MAP.get(language_name)
+        if mapped_from_language_name in TRANSLATIONS:
+            return mapped_from_language_name
+
         return "en"
 
     except Exception as e:
@@ -519,10 +532,10 @@ def extract_text_content(entry: dict[str, Any], last_entry_time_loaded: datetime
                 md_output += f"{formatted_value}\n\n"
 
     # 3. Gemini Response (safeHtmlItem)
-    safeHtmlItem = entry.get("safeHtmlItem", [])
-    if safeHtmlItem:
+    safe_html_item = entry.get("safeHtmlItem", [])
+    if safe_html_item:
         response_text = ""
-        for item in safeHtmlItem:
+        for item in safe_html_item:
             html = item.get("html", "")
             if html:
                 # Convert HTML to text/Markdown and concatenate
